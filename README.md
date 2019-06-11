@@ -15,5 +15,7 @@ await client.SendAsync($"Hello from {typeof(Program).Assembly.FullName}");
 ### Installation
 
 Nuget :
+
 Install-Package Acme.Graylog.Client
+
 https://www.nuget.org/packages/Acme.Graylog.Client/
