@@ -1,10 +1,10 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <Authors>Simon Baudart</Authors>
     <Company>ACME</Company>
-    <Description>Very simple client for Graylog with objective to minimize the required external librairies</Description>
+    <Description>Very simple client for Graylog without a lot of external dependencies</Description>
     <Copyright>© ACME</Copyright>
     <PackageProjectUrl>https://github.com/simonbaudart/Acme.Graylog.Client</PackageProjectUrl>
     <PackageLicenseExpression></PackageLicenseExpression>
@@ -14,6 +14,8 @@
     <PackageTags>graylog, acme, client</PackageTags>
     <NeutralLanguage>en</NeutralLanguage>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <AssemblyVersion>1.0.1.0</AssemblyVersion>
+    <FileVersion>1.0.1.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
