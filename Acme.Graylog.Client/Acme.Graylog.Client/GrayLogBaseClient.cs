@@ -1,6 +1,6 @@
 ﻿// -----------------------------------------------------------------------
-//  <copyright file="GrayLogBaseClient.cs" company="Acme">
-//  Copyright (c) Acme. All rights reserved.
+//  <copyright file="GrayLogBaseClient.cs" company="Prism">
+//  Copyright (c) Prism. All rights reserved.
 //  </copyright>
 // -----------------------------------------------------------------------
 
@@ -34,6 +34,14 @@ namespace Acme.Graylog.Client
         {
             this.Facility = facility;
         }
+
+        /// <summary>
+        /// Sends the message.
+        /// </summary>
+        /// <param name="shortMessage">The short message.</param>
+        /// <param name="fullMessage">The full message.</param>
+        /// <param name="data">The data.</param>
+        public abstract void Send(string shortMessage, string fullMessage = null, object data = null);
 
         /// <summary>
         /// Sends the message in async.

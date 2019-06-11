@@ -1,6 +1,6 @@
 ﻿// -----------------------------------------------------------------------
-//  <copyright file="GrayLogHttpTlsClient.cs" company="Acme">
-//  Copyright (c) Acme. All rights reserved.
+//  <copyright file="GrayLogHttpTlsClient.cs" company="Prism">
+//  Copyright (c) Prism. All rights reserved.
 //  </copyright>
 // -----------------------------------------------------------------------
 
@@ -66,6 +66,20 @@ namespace Acme.Graylog.Client
         }
 
         /// <inheritdoc />
+        public override void Send(string shortMessage, string fullMessage = null, object data = null)
+        {
+            shortMessage.ThrowIfNull(nameof(shortMessage));
+            this.Facility.ThrowIfNull(nameof(this.Facility));
+
+            var log = this.CreateObject(shortMessage, fullMessage, data);
+
+            var serializedLog = JsonConvert.SerializeObject(log);
+            var messageBody = Encoding.UTF8.GetBytes(serializedLog);
+
+            this.SendData(messageBody);
+        }
+
+        /// <inheritdoc />
         public override async Task SendAsync(string shortMessage, string fullMessage = null, object data = null)
         {
             shortMessage.ThrowIfNull(nameof(shortMessage));
@@ -76,7 +90,7 @@ namespace Acme.Graylog.Client
             var serializedLog = JsonConvert.SerializeObject(log);
             var messageBody = Encoding.UTF8.GetBytes(serializedLog);
 
-            await this.SendData(messageBody);
+            await this.SendDataAsync(messageBody);
         }
 
         /// <summary>
@@ -92,8 +106,55 @@ namespace Acme.Graylog.Client
         /// Sends the data.
         /// </summary>
         /// <param name="messageBody">The message body.</param>
+        private void SendData(byte[] messageBody)
+        {
+            var gelfUri = this.GetGelfUri();
+
+            if (this.configuration.UseCompression)
+            {
+                messageBody = this.Compress(messageBody, CompressionLevel.Optimal);
+            }
+
+            var httpWebRequest = (HttpWebRequest)WebRequest.Create(gelfUri);
+            httpWebRequest.ServicePoint.Expect100Continue = false;
+            httpWebRequest.Method = "POST";
+            httpWebRequest.ContentType = "application/json; charset=UTF-8";
+            httpWebRequest.ContentLength = messageBody.Length;
+            httpWebRequest.Expect = string.Empty;
+
+            if (!string.IsNullOrWhiteSpace(this.configuration.ClientCertificatePath))
+            {
+                var certificates = new X509Certificate2Collection();
+                certificates.Import(this.configuration.ClientCertificatePath, this.configuration.ClientCertificatePassword, X509KeyStorageFlags.Exportable);
+
+                httpWebRequest.ClientCertificates = certificates;
+            }
+
+            if (this.configuration.RequestTimeout > 0)
+            {
+                httpWebRequest.ReadWriteTimeout = this.configuration.RequestTimeout;
+                httpWebRequest.Timeout = this.configuration.RequestTimeout;
+            }
+
+            if (this.configuration.UseCompression)
+            {
+                httpWebRequest.Headers.Add(HttpRequestHeader.ContentEncoding, "gzip");
+            }
+
+            using (var requestStream = httpWebRequest.GetRequestStream())
+            {
+                requestStream.Write(messageBody, 0, messageBody.Length);
+            }
+
+            httpWebRequest.GetResponse();
+        }
+
+        /// <summary>
+        /// Sends the data.
+        /// </summary>
+        /// <param name="messageBody">The message body.</param>
         /// <returns>The task to wait</returns>
-        private async Task SendData(byte[] messageBody)
+        private async Task SendDataAsync(byte[] messageBody)
         {
             var gelfUri = this.GetGelfUri();
 
