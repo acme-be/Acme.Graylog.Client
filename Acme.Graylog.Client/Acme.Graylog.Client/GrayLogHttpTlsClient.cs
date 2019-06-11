@@ -117,8 +117,11 @@ namespace Acme.Graylog.Client
                 httpWebRequest.ClientCertificates = certificates;
             }
 
-            httpWebRequest.ReadWriteTimeout = this.configuration.RequestTimeout;
-            httpWebRequest.Timeout = this.configuration.RequestTimeout;
+            if (this.configuration.RequestTimeout > 0)
+            {
+                httpWebRequest.ReadWriteTimeout = this.configuration.RequestTimeout;
+                httpWebRequest.Timeout = this.configuration.RequestTimeout;
+            }
 
             if (this.configuration.UseCompression)
             {
