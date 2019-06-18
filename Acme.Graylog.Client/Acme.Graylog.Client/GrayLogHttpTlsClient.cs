@@ -1,6 +1,6 @@
 ﻿// -----------------------------------------------------------------------
-//  <copyright file="GrayLogHttpTlsClient.cs" company="Prism">
-//  Copyright (c) Prism. All rights reserved.
+//  <copyright file="GrayLogHttpTlsClient.cs" company="Acme">
+//  Copyright (c) Acme. All rights reserved.
 //  </copyright>
 // -----------------------------------------------------------------------
 
@@ -76,7 +76,14 @@ namespace Acme.Graylog.Client
             var serializedLog = JsonConvert.SerializeObject(log);
             var messageBody = Encoding.UTF8.GetBytes(serializedLog);
 
-            this.SendData(messageBody);
+            try
+            {
+                this.SendData(messageBody);
+            }
+            catch (Exception ex)
+            {
+                this.ReportSendError(ex, serializedLog, messageBody);
+            }
         }
 
         /// <inheritdoc />
@@ -90,7 +97,14 @@ namespace Acme.Graylog.Client
             var serializedLog = JsonConvert.SerializeObject(log);
             var messageBody = Encoding.UTF8.GetBytes(serializedLog);
 
-            await this.SendDataAsync(messageBody);
+            try
+            {
+                await this.SendDataAsync(messageBody);
+            }
+            catch (Exception ex)
+            {
+                this.ReportSendError(ex, serializedLog, messageBody);
+            }
         }
 
         /// <summary>

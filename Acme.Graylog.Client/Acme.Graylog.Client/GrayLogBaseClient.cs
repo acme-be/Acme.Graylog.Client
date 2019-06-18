@@ -1,6 +1,6 @@
 ﻿// -----------------------------------------------------------------------
-//  <copyright file="GrayLogBaseClient.cs" company="Prism">
-//  Copyright (c) Prism. All rights reserved.
+//  <copyright file="GrayLogBaseClient.cs" company="Acme">
+//  Copyright (c) Acme. All rights reserved.
 //  </copyright>
 // -----------------------------------------------------------------------
 
@@ -34,6 +34,11 @@ namespace Acme.Graylog.Client
         {
             this.Facility = facility;
         }
+
+        /// <summary>
+        /// Occurs when an exception is thrown when sending a message.
+        /// </summary>
+        public event EventHandler<GraylogSendError> SendErrorOccured;
 
         /// <summary>
         /// Sends the message.
@@ -139,6 +144,19 @@ namespace Acme.Graylog.Client
 
                 log[dataName] = dataValue;
             }
+        }
+
+        /// <summary>
+        /// Reports the send error.
+        /// </summary>
+        /// <param name="exception">The exception.</param>
+        /// <param name="messageContent">Content of the message.</param>
+        /// <param name="messageBody">The message body.</param>
+        protected void ReportSendError(Exception exception, string messageContent, byte[] messageBody)
+        {
+            var error = new GraylogSendError { Exception = exception, MessageContent = messageContent, MessageBody = messageBody };
+
+            this.SendErrorOccured?.Invoke(this, error);
         }
     }
 }
