@@ -107,20 +107,8 @@ namespace Acme.Graylog.Client
             }
         }
 
-        /// <summary>
-        /// Gets the gelf URI.
-        /// </summary>
-        /// <returns>The URI of the GELF path</returns>
-        private Uri GetGelfUri()
-        {
-            return new Uri($"{(this.configuration.UseSsl ? "https://" : "http://")}{this.configuration.Host}:{this.configuration.Port}/gelf");
-        }
-
-        /// <summary>
-        /// Sends the data.
-        /// </summary>
-        /// <param name="messageBody">The message body.</param>
-        private void SendData(byte[] messageBody)
+        /// <inheritdoc />
+        public override void SendData(byte[] messageBody)
         {
             var gelfUri = this.GetGelfUri();
 
@@ -161,6 +149,15 @@ namespace Acme.Graylog.Client
             }
 
             httpWebRequest.GetResponse();
+        }
+
+        /// <summary>
+        /// Gets the gelf URI.
+        /// </summary>
+        /// <returns>The URI of the GELF path</returns>
+        private Uri GetGelfUri()
+        {
+            return new Uri($"{(this.configuration.UseSsl ? "https://" : "http://")}{this.configuration.Host}:{this.configuration.Port}/gelf");
         }
 
         /// <summary>

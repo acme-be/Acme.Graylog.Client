@@ -58,6 +58,13 @@ namespace Acme.Graylog.Client
         public abstract Task SendAsync(string shortMessage, string fullMessage = null, object data = null);
 
         /// <summary>
+        /// Sends the data directly to graylog.
+        /// This can be used to send a messageBody returned in an error event.
+        /// </summary>
+        /// <param name="messageBody">The message body.</param>
+        public abstract void SendData(byte[] messageBody);
+
+        /// <summary>
         /// Converts a DateTime to the long representation which is the number of seconds since the unix epoch.
         /// </summary>
         /// <param name="dateTime">A DateTime to convert to epoch time.</param>

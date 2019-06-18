@@ -29,9 +29,14 @@ namespace Acme.Graylog.Client.Tests
 
             var client = new GrayLogHttpTlsClient(configuration);
 
+            var oldHost = configuration.Host;
+            configuration.Host = "42";
+
             client.SendErrorOccured += (sender, error) =>
                 {
                     Console.WriteLine($"Exception : {error.Exception} when sending message");
+                    configuration.Host = oldHost;
+                    client.SendData(error.MessageBody);
                 };
 
             await client.SendAsync($"Hello from {typeof(Program).Assembly.FullName}");
