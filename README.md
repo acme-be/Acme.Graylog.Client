@@ -12,6 +12,20 @@ var client = new GrayLogHttpTlsClient(configuration);
 await client.SendAsync($"Hello from {typeof(Program).Assembly.FullName}");
 ```
 
+### Errors
+The errors when sending a message can be get in an event, this include the messageBody (compressed binary message) and the messageContent (json)
+
+```
+var client = new GrayLogHttpTlsClient(configuration);
+
+client.SendErrorOccured += (sender, error) =>
+    {
+        Console.WriteLine($"Exception : {error.Exception} when sending message");
+    };
+
+await client.SendAsync($"Hello from {typeof(Program).Assembly.FullName}");
+```
+
 ### Installation
 
 Nuget :
