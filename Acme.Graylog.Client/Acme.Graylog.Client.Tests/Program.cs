@@ -28,6 +28,12 @@ namespace Acme.Graylog.Client.Tests
             var configuration = JsonConvert.DeserializeObject<GraylogConfiguration>(configurationContent);
 
             var client = new GrayLogHttpTlsClient(configuration);
+
+            client.SendErrorOccured += (sender, error) =>
+                {
+                    Console.WriteLine($"Exception : {error.Exception} when sending message");
+                };
+
             await client.SendAsync($"Hello from {typeof(Program).Assembly.FullName}");
         }
     }
