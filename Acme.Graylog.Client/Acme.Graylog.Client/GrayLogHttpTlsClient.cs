@@ -71,7 +71,7 @@ namespace Acme.Graylog.Client
             shortMessage.ThrowIfNull(nameof(shortMessage));
             this.Facility.ThrowIfNull(nameof(this.Facility));
 
-            var log = this.CreateObject(shortMessage, fullMessage, data);
+            var log = this.CreateGelfObject(shortMessage, fullMessage, data);
 
             var serializedLog = JsonConvert.SerializeObject(log);
             var messageBody = Encoding.UTF8.GetBytes(serializedLog);
@@ -92,7 +92,7 @@ namespace Acme.Graylog.Client
             shortMessage.ThrowIfNull(nameof(shortMessage));
             this.Facility.ThrowIfNull(nameof(this.Facility));
 
-            var log = this.CreateObject(shortMessage, fullMessage, data);
+            var log = this.CreateGelfObject(shortMessage, fullMessage, data);
 
             var serializedLog = JsonConvert.SerializeObject(log);
             var messageBody = Encoding.UTF8.GetBytes(serializedLog);

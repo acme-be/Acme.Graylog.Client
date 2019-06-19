@@ -40,6 +40,32 @@ namespace Acme.Graylog.Client.Tests
                 };
 
             await client.SendAsync($"Hello from {typeof(Program).Assembly.FullName}");
+
+            var dummy = new Dummy { FirstName = "Simon", LastName = "Baudart" };
+            var gelf = client.CreateGelfObject("This is a sample object", null, dummy);
+            Console.WriteLine(gelf);
+        }
+
+        /// <summary>
+        /// Represent a dummy data
+        /// </summary>
+        private class Dummy
+        {
+            /// <summary>
+            /// Gets or sets the first name.
+            /// </summary>
+            /// <value>
+            /// The first name.
+            /// </value>
+            public string FirstName { get; set; }
+
+            /// <summary>
+            /// Gets or sets the last name.
+            /// </summary>
+            /// <value>
+            /// The last name.
+            /// </value>
+            public string LastName { get; set; }
         }
     }
 }

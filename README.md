@@ -26,6 +26,15 @@ client.SendErrorOccured += (sender, error) =>
 await client.SendAsync($"Hello from {typeof(Program).Assembly.FullName}");
 ```
 
+### Get the GELF data
+If you need it, you can get the raw GELF data from an object if you want to store it anywhere else.
+
+```
+var dummy = new Dummy { FirstName = "Simon", LastName = "Baudart" };
+var gelf = client.CreateGelfObject("This is a sample object", null, dummy);
+Console.WriteLine(gelf);
+```
+
 ### Installation
 
 Nuget :
