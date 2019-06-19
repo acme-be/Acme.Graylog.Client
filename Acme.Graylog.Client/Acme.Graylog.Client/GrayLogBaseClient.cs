@@ -41,6 +41,41 @@ namespace Acme.Graylog.Client
         public event EventHandler<GraylogSendError> SendErrorOccured;
 
         /// <summary>
+        /// Creates the object in GELF format.
+        /// </summary>
+        /// <param name="shortMessage">The short message.</param>
+        /// <param name="fullMessage">The full message.</param>
+        /// <param name="data">The data.</param>
+        /// <returns>The JOBject in GLEF format</returns>
+        public JObject CreateGelfObject(string shortMessage, string fullMessage, object data)
+        {
+            var log = new JObject();
+            log["version"] = "1.1";
+            log["host"] = Environment.MachineName;
+
+            log["_facility"] = this.Facility;
+
+            log["timestamp"] = ToEpoch(DateTime.UtcNow);
+            log["short_message"] = shortMessage;
+
+            if (!string.IsNullOrWhiteSpace(fullMessage))
+            {
+                log["full_message"] = fullMessage;
+            }
+
+            if (data is string dataString)
+            {
+                log["_data"] = dataString;
+            }
+            else
+            {
+                this.DumpObjectInAdditionnalData(log, data);
+            }
+
+            return log;
+        }
+
+        /// <summary>
         /// Sends the message.
         /// </summary>
         /// <param name="shortMessage">The short message.</param>
@@ -93,41 +128,6 @@ namespace Acme.Graylog.Client
 
                 return memory.ToArray();
             }
-        }
-
-        /// <summary>
-        /// Creates the object.
-        /// </summary>
-        /// <param name="shortMessage">The short message.</param>
-        /// <param name="fullMessage">The full message.</param>
-        /// <param name="data">The data.</param>
-        /// <returns>The JOBject in GLEF format</returns>
-        protected JObject CreateObject(string shortMessage, string fullMessage, object data)
-        {
-            var log = new JObject();
-            log["version"] = "1.1";
-            log["host"] = Environment.MachineName;
-
-            log["_facility"] = this.Facility;
-
-            log["timestamp"] = ToEpoch(DateTime.UtcNow);
-            log["short_message"] = shortMessage;
-
-            if (!string.IsNullOrWhiteSpace(fullMessage))
-            {
-                log["full_message"] = fullMessage;
-            }
-
-            if (data is string dataString)
-            {
-                log["_data"] = dataString;
-            }
-            else
-            {
-                this.DumpObjectInAdditionnalData(log, data);
-            }
-
-            return log;
         }
 
         /// <summary>
