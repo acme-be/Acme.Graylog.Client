@@ -17,6 +17,7 @@ namespace Acme.Graylog.Client
     using Acme.Core.Extensions;
 
     using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
 
     /// <summary>
     /// Graylog client with https
@@ -66,7 +67,7 @@ namespace Acme.Graylog.Client
         }
 
         /// <inheritdoc />
-        public override void Send(string shortMessage, string fullMessage = null, object data = null)
+        public override void Send(string shortMessage, string fullMessage, object data)
         {
             shortMessage.ThrowIfNull(nameof(shortMessage));
             this.Facility.ThrowIfNull(nameof(this.Facility));
@@ -87,7 +88,49 @@ namespace Acme.Graylog.Client
         }
 
         /// <inheritdoc />
-        public override async Task SendAsync(string shortMessage, string fullMessage = null, object data = null)
+        public override void Send(string shortMessage, string fullMessage, JObject data)
+        {
+            shortMessage.ThrowIfNull(nameof(shortMessage));
+            this.Facility.ThrowIfNull(nameof(this.Facility));
+
+            var log = this.CreateGelfObject(shortMessage, fullMessage, data);
+
+            var serializedLog = JsonConvert.SerializeObject(log);
+            var messageBody = Encoding.UTF8.GetBytes(serializedLog);
+
+            try
+            {
+                this.SendData(messageBody);
+            }
+            catch (Exception ex)
+            {
+                this.ReportSendError(ex, serializedLog, messageBody);
+            }
+        }
+
+        /// <inheritdoc />
+        public override async Task SendAsync(string shortMessage, string fullMessage, object data)
+        {
+            shortMessage.ThrowIfNull(nameof(shortMessage));
+            this.Facility.ThrowIfNull(nameof(this.Facility));
+
+            var log = this.CreateGelfObject(shortMessage, fullMessage, data);
+
+            var serializedLog = JsonConvert.SerializeObject(log);
+            var messageBody = Encoding.UTF8.GetBytes(serializedLog);
+
+            try
+            {
+                await this.SendDataAsync(messageBody);
+            }
+            catch (Exception ex)
+            {
+                this.ReportSendError(ex, serializedLog, messageBody);
+            }
+        }
+
+        /// <inheritdoc />
+        public override async Task SendAsync(string shortMessage, string fullMessage, JObject data)
         {
             shortMessage.ThrowIfNull(nameof(shortMessage));
             this.Facility.ThrowIfNull(nameof(this.Facility));

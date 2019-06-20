@@ -9,9 +9,9 @@ namespace Acme.Graylog.Client.Tests
     using System;
     using System.IO;
     using System.Linq;
-    using System.Threading.Tasks;
 
     using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
 
     /// <summary>
     /// Sample class to test
@@ -21,8 +21,7 @@ namespace Acme.Graylog.Client.Tests
         /// <summary>
         /// Defines the entry point of the application.
         /// </summary>
-        /// <returns>The task to wait</returns>
-        private static async Task Main()
+        private static void Main()
         {
             var configurationContent = File.ReadAllText("C:\\TMP\\Acme\\graylog-sample.json");
             var configuration = JsonConvert.DeserializeObject<GraylogConfiguration>(configurationContent);
@@ -39,11 +38,19 @@ namespace Acme.Graylog.Client.Tests
                     client.SendData(error.MessageBody);
                 };
 
-            await client.SendAsync($"Hello from {typeof(Program).Assembly.FullName}");
+            client.Send($"Hello from {typeof(Program).Assembly.FullName}", null, null);
 
             var dummy = new Dummy { FirstName = "Simon", LastName = "Baudart" };
             var gelf = client.CreateGelfObject("This is a sample object", null, dummy);
+            client.Send($"Hello from {typeof(Program).Assembly.FullName}", null, dummy);
             Console.WriteLine(gelf);
+
+            var dummyJobject = new JObject();
+            dummyJobject["firstName"] = "Simon";
+            dummyJobject["lastName"] = "Baudart";
+            dummyJobject["anwser"] = 42;
+
+            client.Send($"Hello from {typeof(Program).Assembly.FullName}", null, dummyJobject);
         }
 
         /// <summary>

@@ -76,12 +76,56 @@ namespace Acme.Graylog.Client
         }
 
         /// <summary>
+        /// Creates the object in GELF format.
+        /// </summary>
+        /// <param name="shortMessage">The short message.</param>
+        /// <param name="fullMessage">The full message.</param>
+        /// <param name="data">The data.</param>
+        /// <returns>The JOBject in GLEF format</returns>
+        public JObject CreateGelfObject(string shortMessage, string fullMessage, JObject data)
+        {
+            var log = new JObject();
+            log["version"] = "1.1";
+            log["host"] = Environment.MachineName;
+
+            log["_facility"] = this.Facility;
+
+            log["timestamp"] = ToEpoch(DateTime.UtcNow);
+            log["short_message"] = shortMessage;
+
+            if (!string.IsNullOrWhiteSpace(fullMessage))
+            {
+                log["full_message"] = fullMessage;
+            }
+
+            if (data == null)
+            {
+                return log;
+            }
+
+            foreach (var property in data.Properties())
+            {
+                log["_" + property.Name] = property.Value;
+            }
+
+            return log;
+        }
+
+        /// <summary>
         /// Sends the message.
         /// </summary>
         /// <param name="shortMessage">The short message.</param>
         /// <param name="fullMessage">The full message.</param>
         /// <param name="data">The data.</param>
-        public abstract void Send(string shortMessage, string fullMessage = null, object data = null);
+        public abstract void Send(string shortMessage, string fullMessage, object data);
+
+        /// <summary>
+        /// Sends the message.
+        /// </summary>
+        /// <param name="shortMessage">The short message.</param>
+        /// <param name="fullMessage">The full message.</param>
+        /// <param name="data">The data.</param>
+        public abstract void Send(string shortMessage, string fullMessage, JObject data);
 
         /// <summary>
         /// Sends the message in async.
@@ -90,7 +134,16 @@ namespace Acme.Graylog.Client
         /// <param name="fullMessage">The full message.</param>
         /// <param name="data">The data.</param>
         /// <returns>The task to wait</returns>
-        public abstract Task SendAsync(string shortMessage, string fullMessage = null, object data = null);
+        public abstract Task SendAsync(string shortMessage, string fullMessage, object data);
+
+        /// <summary>
+        /// Sends the message in async.
+        /// </summary>
+        /// <param name="shortMessage">The short message.</param>
+        /// <param name="fullMessage">The full message.</param>
+        /// <param name="data">The data.</param>
+        /// <returns>The task to wait</returns>
+        public abstract Task SendAsync(string shortMessage, string fullMessage, JObject data);
 
         /// <summary>
         /// Sends the data directly to graylog.
