@@ -81,8 +81,7 @@ namespace Acme.Graylog.Client
 
             try
             {
-                this.SendData(messageBody);
-                this.ReportSendSuccess(serializedLog, messageBody, reference);
+                this.SendData(messageBody, reference);
             }
             catch (Exception ex)
             {
@@ -105,8 +104,7 @@ namespace Acme.Graylog.Client
 
             try
             {
-                this.SendData(messageBody);
-                this.ReportSendSuccess(serializedLog, messageBody, reference);
+                this.SendData(messageBody, reference);
             }
             catch (Exception ex)
             {
@@ -129,8 +127,7 @@ namespace Acme.Graylog.Client
 
             try
             {
-                await this.SendDataAsync(messageBody);
-                this.ReportSendSuccess(serializedLog, messageBody, reference);
+                await this.SendDataAsync(messageBody, reference);
             }
             catch (Exception ex)
             {
@@ -153,7 +150,7 @@ namespace Acme.Graylog.Client
 
             try
             {
-                await this.SendDataAsync(messageBody);
+                await this.SendDataAsync(messageBody, reference);
                 this.ReportSendSuccess(serializedLog, messageBody, reference);
             }
             catch (Exception ex)
@@ -163,8 +160,10 @@ namespace Acme.Graylog.Client
         }
 
         /// <inheritdoc />
-        public override void SendData(byte[] messageBody)
+        public override void SendData(byte[] messageBody, Guid? operationReference = null)
         {
+            var reference = operationReference ?? Guid.NewGuid();
+
             var gelfUri = this.GetGelfUri();
 
             if (this.configuration.UseCompression)
@@ -203,7 +202,15 @@ namespace Acme.Graylog.Client
                 requestStream.Write(messageBody, 0, messageBody.Length);
             }
 
-            httpWebRequest.GetResponse();
+            try
+            {
+                httpWebRequest.GetResponse();
+                this.ReportSendSuccess(null, messageBody, reference);
+            }
+            catch (Exception ex)
+            {
+                this.ReportSendError(ex, null, messageBody, reference);
+            }
         }
 
         /// <summary>
@@ -219,8 +226,11 @@ namespace Acme.Graylog.Client
         /// Sends the data.
         /// </summary>
         /// <param name="messageBody">The message body.</param>
-        /// <returns>The task to wait</returns>
-        private async Task SendDataAsync(byte[] messageBody)
+        /// <param name="reference">The reference.</param>
+        /// <returns>
+        /// The task to wait
+        /// </returns>
+        private async Task SendDataAsync(byte[] messageBody, Guid reference)
         {
             var gelfUri = this.GetGelfUri();
 
@@ -260,7 +270,15 @@ namespace Acme.Graylog.Client
                 await requestStream.WriteAsync(messageBody, 0, messageBody.Length);
             }
 
-            await httpWebRequest.GetResponseAsync();
+            try
+            {
+                await httpWebRequest.GetResponseAsync();
+                this.ReportSendSuccess(null, messageBody, reference);
+            }
+            catch (Exception ex)
+            {
+                this.ReportSendError(ex, null, messageBody, reference);
+            }
         }
     }
 }
