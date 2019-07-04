@@ -43,16 +43,16 @@ namespace Acme.Graylog.Client
             : base(facility)
         {
             this.configuration = new GraylogConfiguration
-                                     {
-                                         Facility = facility,
-                                         Host = host,
-                                         Port = port,
-                                         UseSsl = useSsl,
-                                         UseCompression = useCompression,
-                                         ClientCertificatePath = clientCertificatePath,
-                                         ClientCertificatePassword = clientCertificatePassword,
-                                         RequestTimeout = 120
-                                     };
+            {
+                Facility = facility,
+                Host = host,
+                Port = port,
+                UseSsl = useSsl,
+                UseCompression = useCompression,
+                ClientCertificatePath = clientCertificatePath,
+                ClientCertificatePassword = clientCertificatePassword,
+                RequestTimeout = 120
+            };
         }
 
         /// <summary>
@@ -197,13 +197,13 @@ namespace Acme.Graylog.Client
                 httpWebRequest.Headers.Add(HttpRequestHeader.ContentEncoding, "gzip");
             }
 
-            using (var requestStream = httpWebRequest.GetRequestStream())
-            {
-                requestStream.Write(messageBody, 0, messageBody.Length);
-            }
-
             try
             {
+                using (var requestStream = httpWebRequest.GetRequestStream())
+                {
+                    requestStream.Write(messageBody, 0, messageBody.Length);
+                }
+
                 httpWebRequest.GetResponse();
                 this.ReportSendSuccess(null, messageBody, reference);
             }
@@ -265,13 +265,13 @@ namespace Acme.Graylog.Client
                 httpWebRequest.Headers.Add(HttpRequestHeader.ContentEncoding, "gzip");
             }
 
-            using (var requestStream = httpWebRequest.GetRequestStream())
-            {
-                await requestStream.WriteAsync(messageBody, 0, messageBody.Length);
-            }
-
             try
             {
+                using (var requestStream = httpWebRequest.GetRequestStream())
+                {
+                    await requestStream.WriteAsync(messageBody, 0, messageBody.Length);
+                }
+
                 await httpWebRequest.GetResponseAsync();
                 this.ReportSendSuccess(null, messageBody, reference);
             }
