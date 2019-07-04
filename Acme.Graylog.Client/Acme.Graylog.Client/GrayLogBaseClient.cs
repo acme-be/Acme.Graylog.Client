@@ -41,6 +41,11 @@ namespace Acme.Graylog.Client
         public event EventHandler<GraylogSendError> SendErrorOccured;
 
         /// <summary>
+        /// Occurs when the sending of a message result in success operation.
+        /// </summary>
+        public event EventHandler<GraylogSendResult> SendSuccessful;
+
+        /// <summary>
         /// Creates the object in GELF format.
         /// </summary>
         /// <param name="shortMessage">The short message.</param>
@@ -117,7 +122,8 @@ namespace Acme.Graylog.Client
         /// <param name="shortMessage">The short message.</param>
         /// <param name="fullMessage">The full message.</param>
         /// <param name="data">The data.</param>
-        public abstract void Send(string shortMessage, string fullMessage, object data);
+        /// <param name="operationReference">The operation reference. This reference is used in events to match the source.</param>
+        public abstract void Send(string shortMessage, string fullMessage, object data, Guid? operationReference = null);
 
         /// <summary>
         /// Sends the message.
@@ -125,7 +131,8 @@ namespace Acme.Graylog.Client
         /// <param name="shortMessage">The short message.</param>
         /// <param name="fullMessage">The full message.</param>
         /// <param name="data">The data.</param>
-        public abstract void Send(string shortMessage, string fullMessage, JObject data);
+        /// <param name="operationReference">The operation reference. This reference is used in events to match the source.</param>
+        public abstract void Send(string shortMessage, string fullMessage, JObject data, Guid? operationReference = null);
 
         /// <summary>
         /// Sends the message in async.
@@ -133,8 +140,11 @@ namespace Acme.Graylog.Client
         /// <param name="shortMessage">The short message.</param>
         /// <param name="fullMessage">The full message.</param>
         /// <param name="data">The data.</param>
-        /// <returns>The task to wait</returns>
-        public abstract Task SendAsync(string shortMessage, string fullMessage, object data);
+        /// <param name="operationReference">The operation reference. This reference is used in events to match the source.</param>
+        /// <returns>
+        /// The task to wait
+        /// </returns>
+        public abstract Task SendAsync(string shortMessage, string fullMessage, object data, Guid? operationReference = null);
 
         /// <summary>
         /// Sends the message in async.
@@ -142,8 +152,11 @@ namespace Acme.Graylog.Client
         /// <param name="shortMessage">The short message.</param>
         /// <param name="fullMessage">The full message.</param>
         /// <param name="data">The data.</param>
-        /// <returns>The task to wait</returns>
-        public abstract Task SendAsync(string shortMessage, string fullMessage, JObject data);
+        /// <param name="operationReference">The operation reference. This reference is used in events to match the source.</param>
+        /// <returns>
+        /// The task to wait
+        /// </returns>
+        public abstract Task SendAsync(string shortMessage, string fullMessage, JObject data, Guid? operationReference = null);
 
         /// <summary>
         /// Sends the data directly to graylog.
@@ -212,11 +225,25 @@ namespace Acme.Graylog.Client
         /// <param name="exception">The exception.</param>
         /// <param name="messageContent">Content of the message.</param>
         /// <param name="messageBody">The message body.</param>
-        protected void ReportSendError(Exception exception, string messageContent, byte[] messageBody)
+        /// <param name="operationReference">The operation reference.</param>
+        protected void ReportSendError(Exception exception, string messageContent, byte[] messageBody, Guid operationReference)
         {
-            var error = new GraylogSendError { Exception = exception, MessageContent = messageContent, MessageBody = messageBody };
+            var error = new GraylogSendError { Exception = exception, MessageContent = messageContent, MessageBody = messageBody, OperationReference = operationReference };
 
             this.SendErrorOccured?.Invoke(this, error);
+        }
+
+        /// <summary>
+        /// Reports the send success.
+        /// </summary>
+        /// <param name="messageContent">Content of the message.</param>
+        /// <param name="messageBody">The message body.</param>
+        /// <param name="operationReference">The operation reference.</param>
+        protected void ReportSendSuccess(string messageContent, byte[] messageBody, Guid operationReference)
+        {
+            var result = new GraylogSendResult { MessageContent = messageContent, MessageBody = messageBody, OperationReference = operationReference };
+
+            this.SendSuccessful?.Invoke(this, result);
         }
     }
 }

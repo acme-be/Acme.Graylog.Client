@@ -67,8 +67,10 @@ namespace Acme.Graylog.Client
         }
 
         /// <inheritdoc />
-        public override void Send(string shortMessage, string fullMessage, object data)
+        public override void Send(string shortMessage, string fullMessage, object data, Guid? operationReference = null)
         {
+            var reference = operationReference ?? Guid.NewGuid();
+
             shortMessage.ThrowIfNull(nameof(shortMessage));
             this.Facility.ThrowIfNull(nameof(this.Facility));
 
@@ -80,16 +82,19 @@ namespace Acme.Graylog.Client
             try
             {
                 this.SendData(messageBody);
+                this.ReportSendSuccess(serializedLog, messageBody, reference);
             }
             catch (Exception ex)
             {
-                this.ReportSendError(ex, serializedLog, messageBody);
+                this.ReportSendError(ex, serializedLog, messageBody, reference);
             }
         }
 
         /// <inheritdoc />
-        public override void Send(string shortMessage, string fullMessage, JObject data)
+        public override void Send(string shortMessage, string fullMessage, JObject data, Guid? operationReference = null)
         {
+            var reference = operationReference ?? Guid.NewGuid();
+
             shortMessage.ThrowIfNull(nameof(shortMessage));
             this.Facility.ThrowIfNull(nameof(this.Facility));
 
@@ -101,16 +106,19 @@ namespace Acme.Graylog.Client
             try
             {
                 this.SendData(messageBody);
+                this.ReportSendSuccess(serializedLog, messageBody, reference);
             }
             catch (Exception ex)
             {
-                this.ReportSendError(ex, serializedLog, messageBody);
+                this.ReportSendError(ex, serializedLog, messageBody, reference);
             }
         }
 
         /// <inheritdoc />
-        public override async Task SendAsync(string shortMessage, string fullMessage, object data)
+        public override async Task SendAsync(string shortMessage, string fullMessage, object data, Guid? operationReference = null)
         {
+            var reference = operationReference ?? Guid.NewGuid();
+
             shortMessage.ThrowIfNull(nameof(shortMessage));
             this.Facility.ThrowIfNull(nameof(this.Facility));
 
@@ -122,16 +130,19 @@ namespace Acme.Graylog.Client
             try
             {
                 await this.SendDataAsync(messageBody);
+                this.ReportSendSuccess(serializedLog, messageBody, reference);
             }
             catch (Exception ex)
             {
-                this.ReportSendError(ex, serializedLog, messageBody);
+                this.ReportSendError(ex, serializedLog, messageBody, reference);
             }
         }
 
         /// <inheritdoc />
-        public override async Task SendAsync(string shortMessage, string fullMessage, JObject data)
+        public override async Task SendAsync(string shortMessage, string fullMessage, JObject data, Guid? operationReference = null)
         {
+            var reference = operationReference ?? Guid.NewGuid();
+
             shortMessage.ThrowIfNull(nameof(shortMessage));
             this.Facility.ThrowIfNull(nameof(this.Facility));
 
@@ -143,10 +154,11 @@ namespace Acme.Graylog.Client
             try
             {
                 await this.SendDataAsync(messageBody);
+                this.ReportSendSuccess(serializedLog, messageBody, reference);
             }
             catch (Exception ex)
             {
-                this.ReportSendError(ex, serializedLog, messageBody);
+                this.ReportSendError(ex, serializedLog, messageBody, reference);
             }
         }
 

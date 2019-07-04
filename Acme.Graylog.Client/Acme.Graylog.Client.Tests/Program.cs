@@ -38,6 +38,8 @@ namespace Acme.Graylog.Client.Tests
                     client.SendData(error.MessageBody);
                 };
 
+            client.SendSuccessful += (sender, result) => { Console.WriteLine("Success when sending message"); };
+
             client.Send($"Hello from {typeof(Program).Assembly.FullName}", null, null);
 
             var dummy = new Dummy { FirstName = "Simon", LastName = "Baudart" };
