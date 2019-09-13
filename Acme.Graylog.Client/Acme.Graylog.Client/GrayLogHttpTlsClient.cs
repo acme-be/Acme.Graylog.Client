@@ -66,6 +66,11 @@ namespace Acme.Graylog.Client
             this.configuration = configuration;
         }
 
+        /// <summary>
+        /// Event raised when client validation of certificate is in error
+        /// </summary>
+        public event EventHandler<GraylogTlsClientError> TlsClientError;
+
         /// <inheritdoc />
         public override void Send(string shortMessage, string fullMessage, object data, Guid? operationReference = null)
         {
@@ -172,15 +177,29 @@ namespace Acme.Graylog.Client
             }
 
             var httpWebRequest = (HttpWebRequest)WebRequest.Create(gelfUri);
-            httpWebRequest.ServicePoint.Expect100Continue = false;
+            httpWebRequest.ServicePoint.Expect100Continue = true;
+
             httpWebRequest.Method = "POST";
             httpWebRequest.ContentType = "application/json; charset=UTF-8";
             httpWebRequest.ContentLength = messageBody.Length;
             httpWebRequest.Expect = string.Empty;
 
+            httpWebRequest.ServerCertificateValidationCallback = (sender, certificate, chain, errors) =>
+            {
+                var validationError = new GraylogTlsClientError();
+                validationError.Certificate = certificate;
+                validationError.Chain = chain;
+                validationError.Errors = errors;
+
+                this.TlsClientError?.Invoke(this, validationError);
+
+                return false;
+            };
+
             if (!string.IsNullOrWhiteSpace(this.configuration.ClientCertificatePath))
             {
                 var certificates = new X509Certificate2Collection();
+
                 certificates.Import(this.configuration.ClientCertificatePath, this.configuration.ClientCertificatePassword, X509KeyStorageFlags.Exportable);
 
                 httpWebRequest.ClientCertificates = certificates;
@@ -240,7 +259,7 @@ namespace Acme.Graylog.Client
             }
 
             var httpWebRequest = (HttpWebRequest)WebRequest.Create(gelfUri);
-            httpWebRequest.ServicePoint.Expect100Continue = false;
+            httpWebRequest.ServicePoint.Expect100Continue = true;
             httpWebRequest.Method = "POST";
             httpWebRequest.ContentType = "application/json; charset=UTF-8";
             httpWebRequest.ContentLength = messageBody.Length;
