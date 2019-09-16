@@ -40,7 +40,8 @@ namespace Acme.Graylog.Client
         /// <param name="useCompression">if set to <c>true</c> [use compression].</param>
         /// <param name="clientCertificatePath">The client certificate path.</param>
         /// <param name="clientCertificatePassword">The client certificate password.</param>
-        public GrayLogHttpTlsClient(string facility, string host, int port = 12201, bool useSsl = false, bool useCompression = true, string clientCertificatePath = null, string clientCertificatePassword = null)
+        /// <param name="clientCertificateName">The client certificate name to find in store.</param>
+        public GrayLogHttpTlsClient(string facility, string host, int port = 12201, bool useSsl = false, bool useCompression = true, string clientCertificatePath = null, string clientCertificatePassword = null, string clientCertificateName = null)
             : base(facility)
         {
             this.configuration = new GraylogConfiguration
@@ -52,6 +53,7 @@ namespace Acme.Graylog.Client
                 UseCompression = useCompression,
                 ClientCertificatePath = clientCertificatePath,
                 ClientCertificatePassword = clientCertificatePassword,
+                ClientCertificateName = clientCertificateName,
                 RequestTimeout = 120
             };
         }
