@@ -10,6 +10,7 @@ namespace Acme.Graylog.Client
     using System.IO.Compression;
     using System.Linq;
     using System.Net;
+    using System.Net.Security;
     using System.Security.Cryptography.X509Certificates;
     using System.Text;
     using System.Threading.Tasks;
@@ -186,6 +187,11 @@ namespace Acme.Graylog.Client
 
             httpWebRequest.ServerCertificateValidationCallback = (sender, certificate, chain, errors) =>
             {
+                if (errors == SslPolicyErrors.None)
+                {
+                    return true;
+                }
+                
                 var validationError = new GraylogTlsClientError();
                 validationError.Certificate = certificate;
                 validationError.Chain = chain;
