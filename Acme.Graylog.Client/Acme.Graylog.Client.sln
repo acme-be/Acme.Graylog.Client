@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Acme.Graylog.Client", "Acme
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Acme.Graylog.Client.Tests", "Acme.Graylog.Client.Tests\Acme.Graylog.Client.Tests.csproj", "{B7686250-6654-4FC4-89BC-B8FED15F137E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Acme.Graylog.Client.WebTest", "Acme.Graylog.Client.WebTest\Acme.Graylog.Client.WebTest.csproj", "{B21DDCB5-9D73-42BD-81D1-6EFC9A4A805F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{B7686250-6654-4FC4-89BC-B8FED15F137E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B7686250-6654-4FC4-89BC-B8FED15F137E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B7686250-6654-4FC4-89BC-B8FED15F137E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B21DDCB5-9D73-42BD-81D1-6EFC9A4A805F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B21DDCB5-9D73-42BD-81D1-6EFC9A4A805F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B21DDCB5-9D73-42BD-81D1-6EFC9A4A805F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B21DDCB5-9D73-42BD-81D1-6EFC9A4A805F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -17,6 +17,15 @@ namespace Acme.Graylog.Client
     public class GraylogConfiguration
     {
         /// <summary>
+        /// Gets or sets the client certificate name.
+        /// </summary>
+        /// <value>
+        /// The client certificate name.
+        /// </value>
+        [DataMember(Name = "clientCertificateName")]
+        public string ClientCertificateName { get; set; }
+
+        /// <summary>
         /// Gets or sets the client certificate password.
         /// </summary>
         /// <value>

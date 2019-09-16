@@ -23,26 +23,26 @@ namespace Acme.Graylog.Client.Tests
         /// </summary>
         private static void Main()
         {
-            var configurationContent = File.ReadAllText("C:\\TMP\\Acme\\graylog-sample.json");
+            var configurationContent = File.ReadAllText("C:\\TMP\\Acme\\graylog-sample-cph-dev.json");
             var configuration = JsonConvert.DeserializeObject<GraylogConfiguration>(configurationContent);
 
             var client = new GrayLogHttpTlsClient(configuration);
 
-            var oldHost = configuration.Host;
-            configuration.Host = "42";
+            /*var oldHost = configuration.Host;
+            configuration.Host = "42";*/
 
             client.SendErrorOccured += (sender, error) =>
                 {
                     Console.WriteLine($"Exception : {error.Exception} when sending message");
-                    configuration.Host = oldHost;
-                    client.SendData(error.MessageBody);
+                    /*configuration.Host = oldHost;
+                    client.SendData(error.MessageBody);*/
                 };
 
             client.SendSuccessful += (sender, result) => { Console.WriteLine("Success when sending message"); };
 
             client.Send($"Hello from {typeof(Program).Assembly.FullName}", null, null);
 
-            var dummy = new Dummy { FirstName = "Simon", LastName = "Baudart" };
+           /* var dummy = new Dummy { FirstName = "Simon", LastName = "Baudart" };
             var gelf = client.CreateGelfObject("This is a sample object", null, dummy);
             client.Send($"Hello from {typeof(Program).Assembly.FullName}", null, dummy);
             Console.WriteLine(gelf);
@@ -52,7 +52,7 @@ namespace Acme.Graylog.Client.Tests
             dummyJobject["lastName"] = "Baudart";
             dummyJobject["anwser"] = 42;
 
-            client.Send($"Hello from {typeof(Program).Assembly.FullName}", null, dummyJobject);
+            client.Send($"Hello from {typeof(Program).Assembly.FullName}", null, dummyJobject);*/
         }
 
         /// <summary>

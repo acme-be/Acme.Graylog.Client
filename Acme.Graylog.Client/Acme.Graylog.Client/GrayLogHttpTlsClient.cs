@@ -191,7 +191,7 @@ namespace Acme.Graylog.Client
                 {
                     return true;
                 }
-                
+
                 var validationError = new GraylogTlsClientError();
                 validationError.Certificate = certificate;
                 validationError.Chain = chain;
@@ -202,11 +202,36 @@ namespace Acme.Graylog.Client
                 return false;
             };
 
+            if (!string.IsNullOrWhiteSpace(this.configuration.ClientCertificatePath) && !string.IsNullOrWhiteSpace(this.configuration.ClientCertificateName))
+            {
+                throw new ApplicationException("You cannot specify both the ClientCertificatePath and the ClientCertificateName");
+            }
+
             if (!string.IsNullOrWhiteSpace(this.configuration.ClientCertificatePath))
             {
                 var certificates = new X509Certificate2Collection();
 
                 certificates.Import(this.configuration.ClientCertificatePath, this.configuration.ClientCertificatePassword, X509KeyStorageFlags.Exportable);
+
+                httpWebRequest.ClientCertificates = certificates;
+            }
+
+            if (!string.IsNullOrWhiteSpace(this.configuration.ClientCertificateName))
+            {
+                var store = new X509Store(StoreName.My, StoreLocation.LocalMachine);
+                store.Open(OpenFlags.ReadOnly);
+                var certificates = store.Certificates.Find(X509FindType.FindBySubjectName, this.configuration.ClientCertificateName, true);
+
+                if (certificates.Count == 0)
+                {
+                    certificates = store.Certificates.Find(X509FindType.FindBySubjectName, this.configuration.ClientCertificateName, false);
+                    if (certificates.Count == 0)
+                    {
+                        throw new ApplicationException($"Cannot find a certificate with subject  \"{this.configuration.ClientCertificateName}\" in the computer store");
+                    }
+
+                    throw new ApplicationException($"Found a certificate with subject  \"{this.configuration.ClientCertificateName}\" in the computer store, but certificate is invalid");
+                }
 
                 httpWebRequest.ClientCertificates = certificates;
             }
